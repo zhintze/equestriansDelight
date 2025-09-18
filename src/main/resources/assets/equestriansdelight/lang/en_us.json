@@ -1,0 +1,24 @@
+{
+  "itemGroup.equestriansdelight": "Equestrians Delight",
+  "block.equestriansdelight.example_block": "Example Block",
+  "item.equestriansdelight.example_item": "Example Item",
+  "item.equestriansdelight.monocle": "Equestrian Monocle",
+  "item.equestriansdelight.monocle.tooltip": "+ View Mount Stats",
+
+  "equestriansdelight.configuration.title": "Equestrians Delight Configs",
+  "equestriansdelight.configuration.section.equestriansdelight.common.toml": "Equestrians Delight Configs",
+  "equestriansdelight.configuration.section.equestriansdelight.common.toml.title": "Equestrians Delight Configs",
+  "equestriansdelight.configuration.items": "Item List",
+  "equestriansdelight.configuration.logDirtBlock": "Log Dirt Block",
+  "equestriansdelight.configuration.magicNumberIntroduction": "Magic Number Text",
+  "equestriansdelight.configuration.magicNumber": "Magic Number",
+
+  "horse.tooltip.health": "Health: %s",
+  "horse.tooltip.health.unit": "%s hearts",
+  "horse.tooltip.jump_height": "Jump Height: %s",
+  "horse.tooltip.jump_height.unit": "%s blocks",
+  "horse.tooltip.speed": "Speed: %s",
+  "horse.tooltip.speed.unit": "%s b/s",
+  "horse.tooltip.strength": "Storage: %s",
+  "horse.tooltip.strength.unit": "%s slots"
+}
