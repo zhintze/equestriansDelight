@@ -21,6 +21,11 @@
   "equestriansdelight.configuration.maxStatVariation": "Maximum Stat Variation",
   "equestriansdelight.configuration.maxSpeedMultiplier": "Maximum Speed Multiplier",
   "equestriansdelight.configuration.maxJumpMultiplier": "Maximum Jump Multiplier",
+  "equestriansdelight.configuration.horseSwimmingWhenRidden": "Horse Swimming When Ridden",
+  "equestriansdelight.configuration.enableLeadHitching": "Enable Lead Hitching",
+  "equestriansdelight.configuration.enableHorseCalling": "Enable Horse Calling",
+  "equestriansdelight.configuration.horseCallingRange": "Horse Calling Range",
+  "equestriansdelight.configuration.horseTeleportDistanceThreshold": "Horse Teleport Distance Threshold",
 
   "horse.tooltip.health": "Health: %s",
   "horse.tooltip.health.unit": "%s hearts",

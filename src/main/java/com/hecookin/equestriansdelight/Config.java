@@ -67,6 +67,29 @@ public class Config {
             .comment("Maximum jump height multiplier when limits removed")
             .defineInRange("maxJumpMultiplier", 2.0, 1.0, 5.0);
 
+    // Phase 3: Swimming and Rearing Prevention
+    public static final ModConfigSpec.BooleanValue HORSE_SWIMMING_WHEN_RIDDEN = BUILDER
+            .comment("Allow horses to swim when ridden instead of drowning")
+            .define("horseSwimmingWhenRidden", true);
+
+    // Phase 4: Lead Hitching System
+    public static final ModConfigSpec.BooleanValue ENABLE_LEAD_HITCHING = BUILDER
+            .comment("Enable lead hitching while riding - right click fence with lead in inventory")
+            .define("enableLeadHitching", true);
+
+    // Phase 5: Copper Horn Calling System
+    public static final ModConfigSpec.BooleanValue ENABLE_HORSE_CALLING = BUILDER
+            .comment("Enable calling tamed horses with goat horns")
+            .define("enableHorseCalling", true);
+
+    public static final ModConfigSpec.DoubleValue HORSE_CALLING_RANGE = BUILDER
+            .comment("Range in blocks for horse calling system")
+            .defineInRange("horseCallingRange", 64.0, 16.0, 256.0);
+
+    public static final ModConfigSpec.DoubleValue HORSE_TELEPORT_DISTANCE_THRESHOLD = BUILDER
+            .comment("Distance threshold for using despawn/spawn vs regular teleportation")
+            .defineInRange("horseTeleportDistanceThreshold", 8.0, 4.0, 64.0);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private static boolean validateItemName(final Object obj) {
