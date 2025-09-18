@@ -26,30 +26,49 @@ public record ClientHorseAttributeTooltip(@Nullable Item item, @Nullable Holder<
 
    @Override
    public int getWidth(Font font) {
-      return Math.max(font.width(this.line1), (this.line2 != null ? font.width(this.line2) : 0)) + TEXT_INDENT * 2 + ICON_SIZE;
+      // Name tooltips don't have icons, so don't add ICON_SIZE
+      boolean hasIcon = this.item != null || this.icon != null;
+      int iconSpace = hasIcon ? ICON_SIZE : 0;
+      return Math.max(font.width(this.line1), (this.line2 != null ? font.width(this.line2) : 0)) + TEXT_INDENT * 2 + iconSpace;
    }
 
    @Override
    public int getHeight() {
-      // Return proper height for single line tooltip with adequate spacing
-      return Math.max(ICON_SIZE, 12); // Ensure minimum 12 pixels height for text
+      // Name tooltips get less spacing
+      boolean hasIcon = this.item != null || this.icon != null;
+      if (!hasIcon) {
+         return 10; // Reduced height for name tooltips
+      }
+      return Math.max(ICON_SIZE, 12); // Normal height for stat tooltips
    }
 
    @Override
    public void renderText(Font font, int posX, int posY, Matrix4f matrix4f, MultiBufferSource.BufferSource multiBufferSource) {
+      boolean hasIcon = this.item != null || this.icon != null;
+      int iconOffset = hasIcon ? ICON_SIZE : 0;
+      int textIndent = hasIcon ? TEXT_INDENT : 2; // Less indent for name tooltips
+
       int width1 = font.width(this.line1);
       int width2 = this.line2 != null ? font.width(this.line2) : 0;
       int startX1, startX2;
-      startX1 = startX2 = TEXT_INDENT;
-      if (width2 > width1) {
-         startX1 += (width2 - width1) / 2;
+
+      if (!hasIcon) {
+         // Name tooltip: align to left where icon would normally go
+         startX1 = startX2 = 2;
       } else {
-         startX2 += (width1 - width2) / 2;
+         // Normal tooltip: center after icon
+         startX1 = startX2 = textIndent;
+         if (width2 > width1) {
+            startX1 += (width2 - width1) / 2;
+         } else {
+            startX2 += (width1 - width2) / 2;
+         }
       }
-      if (this.line2 == null) posY += 5;
-      font.drawInBatch(this.line1, posX + ICON_SIZE + startX1, posY + 5 - FIRST_LINE_HEIGHT, -1, true, matrix4f, multiBufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0);
+
+      if (this.line2 == null) posY += hasIcon ? 5 : 2; // Less vertical offset for names
+      font.drawInBatch(this.line1, posX + iconOffset + startX1, posY + (hasIcon ? 5 : 2) - FIRST_LINE_HEIGHT, -1, true, matrix4f, multiBufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0);
       if (this.line2 != null) {
-         font.drawInBatch(this.line2, posX + ICON_SIZE + startX2, posY + 10 - FIRST_LINE_HEIGHT, -1, true, matrix4f, multiBufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0);
+         font.drawInBatch(this.line2, posX + iconOffset + startX2, posY + 10 - FIRST_LINE_HEIGHT, -1, true, matrix4f, multiBufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0);
       }
    }
 

@@ -25,6 +25,8 @@ import java.util.Optional;
 
 public class AttributeOverlayHandler {
 
+    private static final int BACKGROUND_COLOR = 0xFF100010;
+
     // Create tags for inspection equipment and inspectable entities
     private static final TagKey<Item> INSPECTION_EQUIPMENT_ITEM_TAG = TagKey.create(
             BuiltInRegistries.ITEM.key(),
@@ -33,11 +35,20 @@ public class AttributeOverlayHandler {
 
     public static void renderAttributeOverlay(Minecraft minecraft, GuiGraphics guiGraphics, float partialTick) {
         isRenderingTooltipsAllowed(minecraft).ifPresent(abstractHorse -> {
-            RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            // Force rendering on top with explicit Z-depth control
             RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+            // Push matrix to ensure we're rendering in front
+            var poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            poseStack.translate(0, 0, 400); // Move forward in Z-space to render on top
+
             actuallyRenderAttributeOverlay(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), abstractHorse, minecraft.font, minecraft.getItemRenderer());
+
+            poseStack.popPose();
         });
     }
 
@@ -83,9 +94,9 @@ public class AttributeOverlayHandler {
         int spacing = 1; // Increased spacing between tooltip entries for better readability
         totalHeight += (clientTooltips.size() + 2) * spacing; // Add spacing between tooltips
 
-        // Position the unified background
-        int posX = screenWidth / 2 - 12 + 22;
-        int posY = screenHeight / 2 - 15 - totalHeight / 2;
+        // Position at top center of screen
+        int posX = screenWidth / 2 - maxWidth / 2;  // Center horizontally
+        int posY = 3;  // pixels from top of screen
 
         // Render unified background
         renderUnifiedBackground(guiGraphics, posX - padding, posY - padding,
@@ -102,13 +113,13 @@ public class AttributeOverlayHandler {
     // Render unified background for all tooltips
     private static void renderUnifiedBackground(GuiGraphics guiGraphics, int x, int y, int width, int height) {
         // Outer border (dark)
-        guiGraphics.fillGradient(x, y, x + width, y + 1, 0xF0100010, 0xF0100010); // Top
-        guiGraphics.fillGradient(x, y + height - 1, x + width, y + height, 0xF0100010, 0xF0100010); // Bottom
-        guiGraphics.fillGradient(x, y, x + 1, y + height, 0xF0100010, 0xF0100010); // Left
-        guiGraphics.fillGradient(x + width - 1, y, x + width, y + height, 0xF0100010, 0xF0100010); // Right
+        guiGraphics.fillGradient(x, y, x + width, y + 1, BACKGROUND_COLOR, BACKGROUND_COLOR); // Top
+        guiGraphics.fillGradient(x, y + height - 1, x + width, y + height, BACKGROUND_COLOR, BACKGROUND_COLOR); // Bottom
+        guiGraphics.fillGradient(x, y, x + 1, y + height, BACKGROUND_COLOR, BACKGROUND_COLOR); // Left
+        guiGraphics.fillGradient(x + width - 1, y, x + width, y + height, BACKGROUND_COLOR, BACKGROUND_COLOR); // Right
 
         // Main background
-        guiGraphics.fillGradient(x + 1, y + 1, x + width - 1, y + height - 1, 0xF0100010, 0xF0100010);
+        guiGraphics.fillGradient(x + 1, y + 1, x + width - 1, y + height - 1, BACKGROUND_COLOR, BACKGROUND_COLOR);
 
         // Inner gradient borders for that classic tooltip look
         guiGraphics.fillGradient(x + 1, y + 1, x + 2, y + height - 1, 0x505000FF, 0x5028007F);
@@ -139,6 +150,13 @@ public class AttributeOverlayHandler {
             // Use the same calculation method as inventory UI for consistency
             com.hecookin.equestriansdelight.HorseStatsData.Stats stats =
                 com.hecookin.equestriansdelight.HorseStatsData.getHorseStats(horse);
+
+            // Horse name or coat info at the top
+            if (horse.hasCustomName()) {
+                tooltipComponents.add(HorseAttributeTooltip.nameTooltip(horse.getCustomName().getString()));
+            } else {
+                tooltipComponents.add(HorseAttributeTooltip.nameTooltip(stats.variant));
+            }
 
             // Health
             tooltipComponents.add(HorseAttributeTooltip.healthTooltip(stats.healthPoints, true));

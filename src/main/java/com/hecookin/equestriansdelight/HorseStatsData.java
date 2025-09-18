@@ -58,29 +58,26 @@ public class HorseStatsData {
     }
 
     private static double getJumpStrength(AbstractHorse horse) {
-        // Try to access jump strength from horse's attributes
-        // Jump strength is stored in the horse's genetics/attributes
+        // Use the actual JUMP_STRENGTH attribute that Jade uses
+        if (horse.getAttributes().hasAttribute(Attributes.JUMP_STRENGTH)) {
+            return horse.getAttribute(Attributes.JUMP_STRENGTH).getValue();
+        }
+
+        // Fallback: try NBT approach
         CompoundTag nbt = new CompoundTag();
         horse.addAdditionalSaveData(nbt);
-
-        // Jump strength is typically stored as "jumpStrength" in NBT
         if (nbt.contains("jumpStrength")) {
             return nbt.getDouble("jumpStrength");
         }
 
-        // Fallback: try to calculate from horse's movement
-        // This is an approximation if direct access fails
-        return 0.7; // Default average value
+        // Final fallback
+        return 0.7;
     }
 
     private static double calculateJumpHeight(double jumpStrength) {
-        // Approximate conversion from jump strength to block height
-        // This is a rough approximation of the complex physics calculation
-        if (jumpStrength <= 0.4) return 1.0;
-        if (jumpStrength >= 1.0) return 5.9;
-
-        // Linear approximation for display purposes
-        return 1.0 + (jumpStrength - 0.4) * (4.9 / 0.6);
+        // Use Horse Expert's accurate formula: power function approximation
+        // This matches the physics-based calculation better than linear approximation
+        return Math.pow(jumpStrength, 1.7) * 5.293;
     }
 
     private static String getHorseVariant(AbstractHorse horse) {

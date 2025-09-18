@@ -72,7 +72,7 @@ public record HorseAttributeTooltip(@Nullable Item item, @Nullable Holder<MobEff
     private static Component line1(double value, @Nullable ChatFormatting color, String translationKey, DoubleUnaryOperator valueConverter) {
         MutableComponent component1 = Component.literal(formatValue(valueConverter.applyAsDouble(value)));
         if (color != null) component1 = component1.withStyle(color);
-        MutableComponent component2 = Component.translatable(translationKey.concat(".unit"), component1).withStyle(ChatFormatting.GRAY);
+        MutableComponent component2 = Component.translatable(translationKey.concat(".unit"), component1).withStyle(style -> style.withColor(0xAAAAAA));
         return Component.translatable(translationKey, component2).withStyle(ChatFormatting.WHITE);
     }
 
@@ -101,15 +101,17 @@ public record HorseAttributeTooltip(@Nullable Item item, @Nullable Holder<MobEff
         return new HorseAttributeTooltip(null, MobEffects.JUMP, value, "horse.tooltip.jump_height", HorseAttributeTooltip::calculateJumpHeight, ChatFormatting.AQUA);
     }
 
-    // Use same jump height calculation as inventory UI
+    // Use Horse Expert's accurate jump height calculation
     private static double calculateJumpHeight(double jumpStrength) {
-        if (jumpStrength <= 0.4) return 1.0;
-        if (jumpStrength >= 1.0) return 5.9;
-        // Linear approximation for display purposes
-        return 1.0 + (jumpStrength - 0.4) * (4.9 / 0.6);
+        // Power function approximation that matches Minecraft's physics better
+        return Math.pow(jumpStrength, 1.7) * 5.293;
     }
 
     public static HorseAttributeTooltip strengthTooltip(double value) {
         return new HorseAttributeTooltip(Items.CHEST, value, 1.0, 5.0, "horse.tooltip.strength", d -> d * 3);
+    }
+
+    public static HorseAttributeTooltip nameTooltip(String displayText) {
+        return new HorseAttributeTooltip(null, null, Component.literal(displayText).withStyle(ChatFormatting.YELLOW), null);
     }
 }
