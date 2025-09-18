@@ -34,6 +34,39 @@ public class Config {
             .comment("A list of items to log on common setup.")
             .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), () -> "", Config::validateItemName);
 
+    // Horse Breeding Configuration
+    public static final ModConfigSpec.BooleanValue ENABLE_IMPROVED_BREEDING = BUILDER
+            .comment("Enable improved horse breeding system")
+            .define("enableImprovedBreeding", true);
+
+    public static final ModConfigSpec.BooleanValue REMOVE_SPEED_LIMITS = BUILDER
+            .comment("Remove vanilla speed limits for horses")
+            .define("removeSpeedLimits", true);
+
+    public static final ModConfigSpec.BooleanValue REMOVE_JUMP_LIMITS = BUILDER
+            .comment("Remove vanilla jump height limits for horses")
+            .define("removeJumpLimits", true);
+
+    public static final ModConfigSpec.DoubleValue FASTER_PARENT_WEIGHT = BUILDER
+            .comment("Weight percentage for faster parent (0.0 to 1.0)")
+            .defineInRange("fasterParentWeight", 0.6, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue MIN_STAT_VARIATION = BUILDER
+            .comment("Minimum stat variation percentage (-1.0 to 1.0)")
+            .defineInRange("minStatVariation", -0.04, -1.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue MAX_STAT_VARIATION = BUILDER
+            .comment("Maximum stat variation percentage (-1.0 to 1.0)")
+            .defineInRange("maxStatVariation", 0.08, -1.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue MAX_SPEED_MULTIPLIER = BUILDER
+            .comment("Maximum speed multiplier when limits removed")
+            .defineInRange("maxSpeedMultiplier", 3.0, 1.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue MAX_JUMP_MULTIPLIER = BUILDER
+            .comment("Maximum jump height multiplier when limits removed")
+            .defineInRange("maxJumpMultiplier", 2.0, 1.0, 5.0);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private static boolean validateItemName(final Object obj) {

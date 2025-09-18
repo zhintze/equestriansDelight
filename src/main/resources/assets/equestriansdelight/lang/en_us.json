@@ -13,6 +13,15 @@
   "equestriansdelight.configuration.magicNumberIntroduction": "Magic Number Text",
   "equestriansdelight.configuration.magicNumber": "Magic Number",
 
+  "equestriansdelight.configuration.enableImprovedBreeding": "Enable Improved Breeding",
+  "equestriansdelight.configuration.removeSpeedLimits": "Remove Speed Limits",
+  "equestriansdelight.configuration.removeJumpLimits": "Remove Jump Limits",
+  "equestriansdelight.configuration.fasterParentWeight": "Faster Parent Weight",
+  "equestriansdelight.configuration.minStatVariation": "Minimum Stat Variation",
+  "equestriansdelight.configuration.maxStatVariation": "Maximum Stat Variation",
+  "equestriansdelight.configuration.maxSpeedMultiplier": "Maximum Speed Multiplier",
+  "equestriansdelight.configuration.maxJumpMultiplier": "Maximum Jump Multiplier",
+
   "horse.tooltip.health": "Health: %s",
   "horse.tooltip.health.unit": "%s hearts",
   "horse.tooltip.jump_height": "Jump Height: %s",
