@@ -3,6 +3,10 @@ package com.hecookin.equestriansdelight;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.horse.Donkey;
+import net.minecraft.world.entity.animal.horse.Mule;
+import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.nbt.CompoundTag;
 
 public class HorseStatsData {
@@ -70,8 +74,8 @@ public class HorseStatsData {
             return nbt.getDouble("jumpStrength");
         }
 
-        // Final fallback
-        return 0.7;
+        // Final fallback - return 0 for entities without jump strength (like llamas)
+        return 0.0;
     }
 
     private static double calculateJumpHeight(double jumpStrength) {
@@ -81,12 +85,24 @@ public class HorseStatsData {
     }
 
     private static String getHorseVariant(AbstractHorse horse) {
-        if (!(horse instanceof Horse)) {
-            return "Non-Horse";
+        // Handle different mount types
+        if (horse instanceof Horse) {
+            return getRegularHorseVariant(horse);
+        } else if (horse instanceof Llama llama) {
+            return getLlamaVariant(llama);
+        } else if (horse instanceof Donkey) {
+            return "Donkey";
+        } else if (horse instanceof Mule) {
+            return "Mule";
+        } else if (horse instanceof Camel) {
+            return "Camel";
+        } else {
+            // Fallback for any other AbstractHorse types
+            return horse.getType().getDescription().getString();
         }
+    }
 
-        Horse regularHorse = (Horse) horse;
-
+    private static String getRegularHorseVariant(AbstractHorse horse) {
         // Get variant data from NBT
         CompoundTag nbt = new CompoundTag();
         horse.addAdditionalSaveData(nbt);
@@ -105,6 +121,21 @@ public class HorseStatsData {
         } else {
             return colorName + " with " + markingName;
         }
+    }
+
+    private static String getLlamaVariant(Llama llama) {
+        // Get llama variant from NBT
+        CompoundTag nbt = new CompoundTag();
+        llama.addAdditionalSaveData(nbt);
+
+        int variant = nbt.getInt("Variant");
+        return switch (variant) {
+            case 0 -> "Creamy Llama";
+            case 1 -> "White Llama";
+            case 2 -> "Brown Llama";
+            case 3 -> "Gray Llama";
+            default -> "Llama";
+        };
     }
 
     private static String getColorName(int color) {

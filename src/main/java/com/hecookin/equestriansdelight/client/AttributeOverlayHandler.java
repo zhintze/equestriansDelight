@@ -15,7 +15,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.Donkey;
 import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.horse.Mule;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GameType;
@@ -58,7 +60,7 @@ public class AttributeOverlayHandler {
             (entity instanceof AbstractHorse)) {
             if (minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR && minecraft.cameraEntity instanceof Player player &&
                 hasMonocleEquipped(player)) {
-                if (player.getVehicle() != entity && (!(entity instanceof AbstractHorse abstractHorse) || abstractHorse.isTamed())) {
+                if (player.getVehicle() != entity) {
                     return Optional.of(entity);
                 }
             }
@@ -158,22 +160,34 @@ public class AttributeOverlayHandler {
                 tooltipComponents.add(HorseAttributeTooltip.nameTooltip(stats.variant));
             }
 
-            // Health
+            // Health (all AbstractHorse entities have this)
             tooltipComponents.add(HorseAttributeTooltip.healthTooltip(stats.healthPoints, true));
 
-            // Skip speed/jump for llamas
-            if (!(entity instanceof Llama)) {
-                // Speed
+            // Speed (all rideable entities should have movement speed)
+            if (entity.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED)) {
                 tooltipComponents.add(HorseAttributeTooltip.speedTooltip(stats.speedInternal, true));
-                // Jump - use the properly calculated jump strength from inventory UI
+            }
+
+            // Jump (only horses, donkeys, mules have jump strength - llamas don't)
+            if (entity.getAttributes().hasAttribute(Attributes.JUMP_STRENGTH)) {
                 tooltipComponents.add(HorseAttributeTooltip.jumpHeightTooltip(stats.jumpInternal, true));
             }
-        } else if (entity instanceof Llama llama) {
-            // Handle llamas separately
-            if (entity.getAttributes().hasAttribute(Attributes.MAX_HEALTH)) {
-                tooltipComponents.add(HorseAttributeTooltip.healthTooltip(entity.getAttributeValue(Attributes.MAX_HEALTH), false));
+
+            // Storage for entities that can carry items
+            if (entity instanceof Llama llama) {
+                // Llamas have natural storage based on strength
+                tooltipComponents.add(HorseAttributeTooltip.strengthTooltip(llama.getStrength()));
+            } else if (entity instanceof Donkey donkey) {
+                // Donkeys only have storage when chest is equipped
+                if (donkey.hasChest()) {
+                    tooltipComponents.add(HorseAttributeTooltip.strengthTooltip(5)); // 15 slots when chest equipped
+                }
+            } else if (entity instanceof Mule mule) {
+                // Mules only have storage when chest is equipped
+                if (mule.hasChest()) {
+                    tooltipComponents.add(HorseAttributeTooltip.strengthTooltip(5)); // 15 slots when chest equipped
+                }
             }
-            tooltipComponents.add(HorseAttributeTooltip.strengthTooltip(llama.getStrength()));
         }
 
         return tooltipComponents;

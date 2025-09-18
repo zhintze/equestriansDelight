@@ -12,9 +12,9 @@ public class HorseStatsEventHandler {
 
     @SubscribeEvent
     public static void onScreenRender(ScreenEvent.Render.Post event) {
-        if (event.getScreen() instanceof HorseInventoryScreen horseScreen) {
+        /*if (event.getScreen() instanceof HorseInventoryScreen horseScreen) {
             HorseStatsPanel.renderStatsPanel(horseScreen, event.getGuiGraphics(), (int)event.getMouseX(), (int)event.getMouseY());
-        }
+        }*/
     }
 
     @SubscribeEvent
