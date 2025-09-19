@@ -17,7 +17,7 @@ public class HorseBehaviorEnhancer {
 
     // Track buoyancy state for each horse
     private static final Map<UUID, Integer> horseBuoyancyCooldown = new HashMap<>();
-    private static final Map<UUID, Double> horsePeakHeight = new HashMap<>();
+    private static final Map<UUID, Boolean> horseAboveWater = new HashMap<>();
 
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Pre event) {
@@ -36,12 +36,12 @@ public class HorseBehaviorEnhancer {
                         horse.getDeltaMovement().z * horse.getDeltaMovement().z
                     );
 
-                    // Track peak height for cooldown system
-                    double currentHeight = horse.getY();
-                    Double peakHeight = horsePeakHeight.get(horseId);
-                    if (peakHeight == null || currentHeight > peakHeight) {
-                        horsePeakHeight.put(horseId, currentHeight);
-                    }
+                    // Check if horse head is above water surface (simple approach)
+                    boolean isAboveWater = !horse.isUnderWater();
+
+                    // Track if horse transitions from underwater to above water
+                    Boolean wasAboveWater = horseAboveWater.get(horseId);
+                    if (wasAboveWater == null) wasAboveWater = false;
 
                     // Get current cooldown
                     Integer cooldown = horseBuoyancyCooldown.getOrDefault(horseId, 0);
@@ -53,11 +53,14 @@ public class HorseBehaviorEnhancer {
                         // Moving - check if we should apply buoyancy
                         boolean shouldApplyBuoyancy = true;
 
-                        // If we're near peak height and have been going up, start cooldown
-                        if (peakHeight != null && currentHeight >= peakHeight - 0.1 && horse.getDeltaMovement().y > 0.1) {
-                            horseBuoyancyCooldown.put(horseId, 20); // 1 second pause at 20 ticks
+                        // If horse goes above water surface, start cooldown
+                        if (!wasAboveWater && isAboveWater && cooldown <= 0) {
+                            horseBuoyancyCooldown.put(horseId, 100); // 5 second pause
                             shouldApplyBuoyancy = false;
                         }
+
+                        // Update the above water tracking
+                        horseAboveWater.put(horseId, isAboveWater);
 
                         if (shouldApplyBuoyancy && cooldown <= 0) {
                             // Apply speed-based buoyancy
@@ -72,8 +75,8 @@ public class HorseBehaviorEnhancer {
                             }
                         }
 
-                        // Prevent excessive sinking while moving
-                        if (horse.getDeltaMovement().y < -0.02) {
+                        // Prevent excessive sinking while moving (only when not in cooldown)
+                        if (cooldown <= 0 && horse.getDeltaMovement().y < -0.02) {
                             horse.setDeltaMovement(
                                 horse.getDeltaMovement().x,
                                 Math.max(horse.getDeltaMovement().y, -0.02),
@@ -81,9 +84,9 @@ public class HorseBehaviorEnhancer {
                             );
                         }
                     } else {
-                        // Not moving - reset peak height and allow controlled sinking
-                        horsePeakHeight.remove(horseId);
-                        horseBuoyancyCooldown.remove(horseId);
+                        // Not moving - update above water tracking but keep cooldown
+                        horseAboveWater.put(horseId, isAboveWater);
+                        // Don't remove cooldown when not moving - let it continue counting down
 
                         if (horse.getDeltaMovement().y < -0.1) {
                             horse.setDeltaMovement(
@@ -96,7 +99,7 @@ public class HorseBehaviorEnhancer {
                 } else {
                     // Not in water - clean up tracking data
                     UUID horseId = horse.getUUID();
-                    horsePeakHeight.remove(horseId);
+                    horseAboveWater.remove(horseId);
                     horseBuoyancyCooldown.remove(horseId);
                 }
             }
